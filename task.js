@@ -7,17 +7,20 @@ uniform mat4 uTransformMatrix;
 uniform mat4 uPerspectiveMatrix;
 uniform mat4 uModelViewMatrix;
 out vec4 vNormal;
+out vec3 vPosition;
 
 void main() {
     vec4 modeledNormal = uPerspectiveMatrix * uModelViewMatrix * uTransformMatrix * vec4(aNormal, 1.0);
     vec4 normalizedNormal = normalize(modeledNormal);
     gl_Position = uPerspectiveMatrix * uModelViewMatrix * uTransformMatrix * vec4(aPosition, 1.0);
     vNormal = normalizedNormal;
+    vPosition = aPosition;
 }`;
 
 const fsSource = `#version 300 es
 precision mediump float;
 
+in vec3 vPosition;
 in vec4 vNormal;
 out vec4 fragColor;
 uniform vec3 uAmbientColor;
@@ -25,10 +28,16 @@ uniform vec3 uLightColor;
 uniform vec3 uLightDirection;
 
 void main() {
-    vec4 lightDirectionNormalazed = normalize(vec4(uLightDirection, 1.0));
+    vec3 offset = uLightDirection - vPosition;
+    float distance = length(offset);
+    vec4 direction = vec4(normalize(offset), 1.0);
+
     vec4 normal = normalize(vNormal);
-    float brightness = max(dot(lightDirectionNormalazed, normal), 0.0);
-    fragColor = vec4(uAmbientColor + uLightColor * brightness, 1.0);
+    float attenuation = 1.0 / (distance * distance);
+    float brightness = max(dot(direction, normal), 0.0);
+    vec3 diffuseColor = uLightColor * brightness;
+
+    fragColor = vec4(uAmbientColor + diffuseColor, 1.0);
 }`;
 
 function main() {
@@ -76,7 +85,7 @@ function main() {
 
     const ambientColor = [0, 0.3, 0];
     const lightColor = [1, 1, 1];
-    const lightDirection = [1 ,1, 0];
+    const lightDirection = [1 ,1, -0.5];
     gl.uniform3f(uAmbientColor, ...ambientColor);
     gl.uniform3f(uLightColor, ...lightColor);
     gl.uniform3f(uLightDirection, ...lightDirection);
