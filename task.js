@@ -11,9 +11,8 @@ out vec3 vPosition;
 
 void main() {
     vec4 modeledNormal = uPerspectiveMatrix * uModelViewMatrix * uTransformMatrix * vec4(aNormal, 1.0);
-    vec4 normalizedNormal = normalize(modeledNormal);
     gl_Position = uPerspectiveMatrix * uModelViewMatrix * uTransformMatrix * vec4(aPosition, 1.0);
-    vNormal = normalizedNormal;
+    vNormal = modeledNormal;
     vPosition = aPosition;
 }`;
 
@@ -33,9 +32,9 @@ void main() {
     vec4 direction = vec4(normalize(offset), 1.0);
 
     vec4 normal = normalize(vNormal);
-    float attenuation = 1.0 / (distance * distance);
     float brightness = max(dot(direction, normal), 0.0);
-    vec3 diffuseColor = uLightColor * brightness;
+    float attenuation = 1.0 / (distance * distance);
+    vec3 diffuseColor = uLightColor * brightness * attenuation;
 
     fragColor = vec4(uAmbientColor + diffuseColor, 1.0);
 }`;
@@ -85,7 +84,7 @@ function main() {
 
     const ambientColor = [0, 0.3, 0];
     const lightColor = [1, 1, 1];
-    const lightDirection = [1 ,1, -0.5];
+    const lightDirection = [0 ,1, 0];
     gl.uniform3f(uAmbientColor, ...ambientColor);
     gl.uniform3f(uLightColor, ...lightColor);
     gl.uniform3f(uLightDirection, ...lightDirection);
@@ -204,7 +203,7 @@ function main() {
         ];
     };
 
-    let angle = 0.0;
+    let angle = 40.0;
 
     const draw = () => {
         gl.clearColor(0, 0, 0, 1.0);
@@ -237,7 +236,7 @@ function main() {
         gl.uniformMatrix4fv(uPerspectiveMatrix, false, perspectiveMatrix);
         gl.uniformMatrix4fv(uModelViewMatrix, false, modelViewMatrix)
         gl.drawArrays(gl.TRIANGLES, 0, 36);
-        requestAnimationFrame(draw)
+        //requestAnimationFrame(draw)
     };
     draw();
 }
