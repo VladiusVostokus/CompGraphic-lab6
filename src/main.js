@@ -155,21 +155,12 @@ function main() {
     const draw = () => {
         gl.clearColor(0, 0, 0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-        //mat4.rotateY(modelViewMatrix, modelViewMatrix, 0.02);
-        //const rotY = mat4.create();
-        //const rotX = mat4.create();
-        //mat4.rotateY(rotY, rotY, 0.02);
-        //mat4.rotateX(rotX, rotX, 0.02);
-        //mat4.multiply(rotY, rotY, rotX);
-        //mat4.multiply(modelViewMatrix,modelViewMatrix,rotY);
-        mat4.rotate(modelViewMatrix, modelViewMatrix, 0.02, [1,1,0]);
+        mat4.rotate(modelViewMatrix, modelViewMatrix, 70, [1,1,0]);
         mat4.perspectiveNO(perspectiveMatrix,fovY, aspectRatio, 0.1, 10);
 
         gl.uniformMatrix4fv(uPerspectiveMatrix, false, perspectiveMatrix);
         gl.uniformMatrix4fv(uModelViewMatrix, false, modelViewMatrix)
         gl.drawArrays(gl.TRIANGLES, 0, 36);
-        requestAnimationFrame(draw)
     };
     draw();
 };
