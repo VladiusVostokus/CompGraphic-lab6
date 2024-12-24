@@ -1,5 +1,7 @@
 'use strict';
 
+//import { mat4 } from 'gl-matrix.js';
+
 const vsSource = `#version 300 es
 in vec3 aPosition;
 in vec3 aNormal;
@@ -95,6 +97,10 @@ const multiply = (a, b) => {
       b30 * a03 + b31 * a13 + b32 * a23 + b33 * a33,
     ];
 };
+/*
+const transformMatrix = mat4.identity();
+const modelViewMatrix = mat4.identity();
+const perspectiveMatrix = mat4.identity(); */
 
 function main() {
     const canvas = document.querySelector("#glcanvas");
@@ -213,7 +219,9 @@ function main() {
         const sin = Math.sin(radian);
         if (angle === 360.0) angle = 0.0;
         angle++;
+        
         const modelViewMatrix = translate([0, -0.3, -3.5]);
+        //mat4.lookAt(modelViewMatrix,[0, -0.3, -3.5]);
         const perspectiveMatrix = perspective(fovY, aspectRatio, 0.1, 10);
 
         const projectionMatrix_Y = [
