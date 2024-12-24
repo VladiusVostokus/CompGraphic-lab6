@@ -239,4 +239,8 @@ function main() {
         //requestAnimationFrame(draw)
     };
     draw();
-}
+};
+
+window.onload = () => {
+  main();
+};
